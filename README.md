@@ -30,8 +30,7 @@ preview. Replace the image below with your own demo GIF if desired.
 ![Omarchy Notification Center preview](assets/preview.gif)
 -->
 
-**Video preview:** upload your demo video to GitHub and place the resulting
-video link here.
+
 
 ## Features
 
