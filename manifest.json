@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "shahriar.notification-center",
+  "name": "Notification Center",
+  "version": "1.1.0",
+  "author": "Shahriar",
+  "description": "A theme-aware notification history panel backed by Omarchy's first-party Quickshell notification service.",
+  "kinds": [
+    "panel",
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "panel": "NotificationCenter.qml",
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Notifications",
+    "category": "System",
+    "defaultSection": "right",
+    "allowMultiple": false
+  }
+}
