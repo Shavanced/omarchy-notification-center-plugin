@@ -10,8 +10,7 @@ It adds a searchable panel for live notifications and persistent notification hi
 
 ## Preview
 
-
-https://github.com/user-attachments/assets/cbeb62da-a683-4002-aaee-bdc16e272d4a
+https://github.com/user-attachments/assets/7aee22d6-ecdb-4f90-a319-63bc2437df0e
 
 Btw this is the theme I am using which I made feel free to check: https://github.com/Shavanced/ame-quattro.git
 <!--
