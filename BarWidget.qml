@@ -5,7 +5,7 @@ import qs.Ui
 
 BarWidget {
   id: root
-  moduleName: "shahriar.notification-center"
+  moduleName: "shavanced.notification-center"
 
   // The bar passes its shell object to widgets. This is the existing first-
   // party service, not a second notification daemon.
@@ -28,7 +28,7 @@ BarWidget {
       if (buttonCode === Qt.RightButton && root.notificationService)
         root.notificationService.clearPopups()
       else
-        Quickshell.execDetached(["omarchy-shell", "shell", "toggle", "shahriar.notification-center", "{}"])
+        Quickshell.execDetached(["omarchy-shell", "shell", "toggle", "shavanced.notification-center", "{}"])
     }
   }
 
