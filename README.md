@@ -1,3 +1,5 @@
+
+
 # Omarchy Notification Center
 
 A native notification center for **Omarchy**.
@@ -8,6 +10,10 @@ It adds a searchable panel for live notifications and persistent notification hi
 
 ## Preview
 
+
+https://github.com/user-attachments/assets/cbeb62da-a683-4002-aaee-bdc16e272d4a
+
+Btw this is the theme I am using which I made feel free to check: https://github.com/Shavanced/ame-quattro.git
 <!--
 VIDEO PREVIEW
 -------------
