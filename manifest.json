@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "id": "shahriar.notification-center",
+  "id": "shavanced.notification-center",
   "name": "Notification Center",
-  "version": "1.1.0",
-  "author": "Shahriar",
-  "description": "A theme-aware notification history panel backed by Omarchy's first-party Quickshell notification service.",
+  "version": "1.2.0",
+  "author": "Shavanced",
+  "description": "A native Omarchy notification center with live notifications, persistent history, search, and a theme-aware bar widget.",
   "kinds": [
     "panel",
     "bar-widget"
