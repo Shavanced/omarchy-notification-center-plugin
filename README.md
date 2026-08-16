@@ -2,7 +2,7 @@
 
 # Omarchy Notification Center
 
-A native notification center for **Omarchy**.
+A native notification center for **Omarchy**. This plugin is also available on the Omarchy Plugin Marketplace: https://omarchyplugins.com/plugin.html?id=shavanced.notification-center
 
 It adds a searchable panel for live notifications and persistent notification history while continuing to use Omarchy's built-in `omarchy.notifications` service.
 
@@ -10,27 +10,11 @@ It adds a searchable panel for live notifications and persistent notification hi
 
 ## Preview
 
+![preview.png](https://github.com/Shavanced/omarchy-notification-center-plugin/blob/main/preview.png?raw=true)
+
 https://github.com/user-attachments/assets/8ca7bee3-50a9-412f-8e69-fe48e5158431
 
-Btw this is the theme I am using which I made feel free to check: https://github.com/Shavanced/ame-quattro.git
-<!--
-VIDEO PREVIEW
--------------
-For the GitHub repository page, upload your demo video to a GitHub-supported
-location (for example an issue/comment/discussion) and paste the resulting
-video URL below.
-
-Example:
-
-https://github.com/user-attachments/assets/YOUR-VIDEO-ID
-
-For the repository README itself, an animated GIF is the most reliable inline
-preview. Replace the image below with your own demo GIF if desired.
-
-![Omarchy Notification Center preview](assets/preview.gif)
--->
-
-
+In the preview I am using my custom "Ame-quattro" theme, feel free to check: https://github.com/Shavanced/ame-quattro.git
 
 ## Features
 
@@ -58,7 +42,7 @@ history provided by Omarchy's notification service.
 
 ### Omarchy plugin system
 
-Once the repository is publicly available:
+Run this to install:
 
 ```bash
 omarchy plugin add https://github.com/Shavanced/omarchy-notification-center-plugin.git --enable
@@ -183,9 +167,11 @@ omarchy-shell shell rescanPlugins
 ```text
 omarchy-notification-center-plugin/
 ├── BarWidget.qml
+├── LICENSE
 ├── NotificationCenter.qml
 ├── README.md
-└── manifest.json
+├── manifest.json
+└── preview.png
 ```
 
 ## Security
