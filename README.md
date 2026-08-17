@@ -20,6 +20,7 @@ In the preview I am using my custom "Ame-quattro" theme, feel free to check: htt
 - **Live notifications** from Omarchy's first-party notification service.
 - **Persistent notification history** maintained by Omarchy.
 - History is shown without replaying old notifications as new popups.
+- **Click a notification to open or focus the sending application** (uses `hyprctl` under the hood; falls back to `omarchy-launch-or-focus` when available).
 - Search notifications by application, title, or body.
 - Individual dismissal for live notifications.
 - Clear all live notifications and saved history.
@@ -94,6 +95,14 @@ Test it with:
 ```bash
 notify-send -a "Test" "Notification Center" "Hello from Omarchy!"
 ```
+
+### Click to open application
+
+Clicking a notification in the panel will focus the window of the application
+that sent it. If the application is not running, it will be launched via
+`omarchy-launch-or-focus`.
+
+To dismiss a notification instead, hover over it and click the **✕** button.
 
 ## How it works
 

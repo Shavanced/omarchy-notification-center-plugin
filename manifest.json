@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "shavanced.notification-center",
   "name": "Notification Center",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "author": "Shavanced",
   "license": "MIT",
   "description": "A native Omarchy notification center with live notifications, persistent history, search, Do Not Disturb, and a theme-aware bar widget.",

@@ -155,6 +155,53 @@ BarWidget {
     rebuildRows()
   }
 
+  // ---- Focus / launch the app that sent a notification.
+  // Uses omarchy-launch-or-focus when available (exact word-boundary match on
+  // window class/title).  Falls back to a direct hyprctl lookup so the feature
+  // works even on minimal installs.
+  property string focusTarget: ""
+
+  function focusApp(appName) {
+    var name = String(appName || "").trim()
+    if (name === "" || name === "notify-send" || name === "omarchy-action") return
+    root.focusTarget = name
+    focusLookup.command = ["hyprctl", "clients", "-j"]
+    focusLookup.running = true
+  }
+
+  function resolveFocusFromClients(json) {
+    var target = root.focusTarget
+    if (!target) return
+    try {
+      var clients = JSON.parse(json)
+      var needle = target.toLowerCase()
+      var best = null
+      for (var i = 0; i < clients.length; i++) {
+        var c = clients[i]
+        if (!c) continue
+        var cls = String(c["class"] || "").toLowerCase()
+        var title = String(c["title"] || "").toLowerCase()
+        if (cls === needle || title === needle ||
+            cls.indexOf(needle) >= 0 || title.indexOf(needle) >= 0 ||
+            needle.indexOf(cls) >= 0) {
+          best = c
+          break
+        }
+      }
+      if (best && best.address) {
+        focusDispatch.command = ["hyprctl", "dispatch", "focuswindow", "address:" + best.address]
+        focusDispatch.running = true
+        root.close()
+        return
+      }
+    } catch (e) { /* ignore parse errors */ }
+
+    // No matching window found — try to launch via omarchy-launch-or-focus.
+    focusLaunch.command = ["omarchy-launch-or-focus", target]
+    focusLaunch.running = true
+    root.close()
+  }
+
   function clearSearch() {
     root.query = ""
     searchField.text = ""
@@ -233,6 +280,25 @@ BarWidget {
       waitForEnd: true
       onStreamFinished: root.parseHistory(text)
     }
+  }
+
+  Process {
+    id: focusLookup
+    running: false
+    stdout: StdioCollector {
+      waitForEnd: true
+      onStreamFinished: root.resolveFocusFromClients(text)
+    }
+  }
+
+  Process {
+    id: focusDispatch
+    running: false
+  }
+
+  Process {
+    id: focusLaunch
+    running: false
   }
 
   Connections {
@@ -449,14 +515,14 @@ BarWidget {
           color: "transparent"
           borderSpec: Border.flat(root.colBorder, Style.normalBorderWidth)
 
-          // Left click dismisses. Hover reveals a dedicated close (x)
-          // button as an alternate, more discoverable way to dismiss.
+          // Left-click opens/focuses the sending application.
+          // Hover reveals a dedicated close (x) button for dismissal.
           MouseArea {
             id: rowHoverArea
             anchors.fill: parent
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
-            onClicked: root.dismiss(rowCard.modelData)
+            onClicked: root.focusApp(rowCard.modelData.app)
           }
 
           RowLayout {
@@ -607,7 +673,7 @@ BarWidget {
       // ----------------------------------------- footer legend
       Text {
         Layout.fillWidth: true
-        text: "Left-click or hover the ✕ to dismiss · Esc closes"
+        text: "Click to open app · Hover ✕ to dismiss · Esc closes"
         font.family: root.bar ? root.bar.fontFamily : ""
         color: Qt.darker(root.colForeground, 1.55)
         font.pixelSize: Style.font.caption
