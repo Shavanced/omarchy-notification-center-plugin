@@ -12,7 +12,6 @@ It adds a searchable panel for live notifications and persistent notification hi
 
 ![preview.png](https://github.com/Shavanced/omarchy-notification-center-plugin/blob/main/preview.png?raw=true)
 
-https://github.com/user-attachments/assets/8ca7bee3-50a9-412f-8e69-fe48e5158431
 
 In the preview I am using my custom "Ame-quattro" theme, feel free to check: https://github.com/Shavanced/ame-quattro.git
 
@@ -161,19 +160,6 @@ After editing a local plugin:
 ```bash
 omarchy-shell shell rescanPlugins
 ```
-
-## Plugin structure
-
-```text
-omarchy-notification-center-plugin/
-├── BarWidget.qml
-├── LICENSE
-├── NotificationCenter.qml
-├── README.md
-├── manifest.json
-└── preview.png
-```
-
 ## Security
 
 Omarchy plugins run as unsandboxed code inside the long-lived Omarchy shell
