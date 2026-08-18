@@ -26,6 +26,8 @@ BarWidget {
   moduleName: "shavanced.notification-center"
 
   property bool popupOpen: false
+  readonly property bool opened: popupOpen
+  function open() { popupOpen = true }
   function close() { popupOpen = false }
 
   property string query: ""
