@@ -210,11 +210,6 @@ BarWidget {
       clearSearch()
       refreshHistory()
       rebuildRows()
-      // Explicitly grab keyboard focus for the search field. Without this,
-      // a wlr-layer-shell popup can render and accept mouse clicks while
-      // still not reliably routing keystrokes to a child TextField, which
-      // is what made typing feel inconsistent.
-      Qt.callLater(function() { if (root.popupOpen) searchField.forceActiveFocus() })
     }
   }
   onQueryChanged: rebuildRows()
@@ -265,12 +260,13 @@ BarWidget {
     }
   }
 
-  PopupCard {
+  KeyboardPanel {
     id: popup
     anchorItem: button
     bar: root.bar
     owner: root
     open: root.popupOpen
+    focusTarget: searchField
     contentWidth: popup.fittedContentWidth(Style.space(440))
     contentHeight: popup.cappedContentHeight(Style.space(540))
 
