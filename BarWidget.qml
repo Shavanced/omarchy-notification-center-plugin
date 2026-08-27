@@ -41,9 +41,16 @@ BarWidget {
   }
 
   // Look up the long-running notifications service through the shell host.
+  // firstPartyServiceFor() is a plain lookup keyed by the id the service is
+  // actually enabled under, so `omarchy plugin clone omarchy.notifications`
+  // would leave us with nothing. Ask the registry which id is live first;
+  // hosts without resolveEnabledId keep using the built-in id as before.
   readonly property var hostShell: bar && bar.shell ? bar.shell : null
+  readonly property string notificationServiceId: hostShell && hostShell.pluginRegistry
+    && typeof hostShell.pluginRegistry.resolveEnabledId === "function"
+    ? hostShell.pluginRegistry.resolveEnabledId("omarchy.notifications") : "omarchy.notifications"
   readonly property var notificationService: hostShell && hostShell.firstPartyServiceFor
-    ? hostShell.firstPartyServiceFor("omarchy.notifications") : null
+    ? hostShell.firstPartyServiceFor(root.notificationServiceId) : null
 
   readonly property int liveCount: notificationService && notificationService.popupModel
     ? notificationService.popupModel.count : 0
