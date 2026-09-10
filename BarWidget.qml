@@ -45,18 +45,65 @@ BarWidget {
   readonly property var notificationService: hostShell && hostShell.firstPartyServiceFor
     ? hostShell.firstPartyServiceFor("omarchy.notifications") : null
 
+  // Omarchy 4.0.3 capability-scopes plugin shell access: for a bar-widget the
+  // facade's firstPartyServiceFor() answers null, so the service is not
+  // reachable as an object. Its state stays reachable two ways, and both are
+  // stable first-party host constants:
+  //
+  //   - history: one JSON file per moved notification under
+  //     ~/.local/state/omarchy/notifications/history
+  //   - DND: the service persists {dnd} to ~/.local/state/omarchy/notifications.json
+  //     on every change; watch that file and toggle through the host's own
+  //     "notifications" IPC target
+  //
+  // The live popup model cannot be reached without the service object, so on a
+  // scoped host the merged list shows on-disk history entries; live toasts
+  // keep arriving through the shell's own daemon and land in history when
+  // they are dismissed.
   readonly property int liveCount: notificationService && notificationService.popupModel
     ? notificationService.popupModel.count : 0
   readonly property string historyDir: notificationService && notificationService.historyDir
-    ? String(notificationService.historyDir) : ""
+    ? String(notificationService.historyDir)
+    : Quickshell.env("HOME") + "/.local/state/omarchy/notifications/history"
 
-  // ---- DND (guarded: lives on Omarchy's first-party service, not here).
-  readonly property bool dndSupported: !!notificationService
-    && typeof notificationService.doNotDisturb === "boolean"
-    && typeof notificationService.setDoNotDisturb === "function"
-  readonly property bool dndOn: dndSupported && notificationService.doNotDisturb
+  FileView {
+    id: dndStateFile
+    path: Quickshell.env("HOME") + "/.local/state/omarchy/notifications.json"
+    watchChanges: true
+    onFileChanged: reload()
+    onLoaded: root.dndStateRevision++
+  }
+  property int dndStateRevision: 0
+
+  // ---- DND: the service object when available, its persisted state file
+  // otherwise. The file is absent until the first toggle, which is the same
+  // default the service starts from.
+  readonly property bool dndSupported: true
+  readonly property bool dndOn: {
+    var revision = root.dndStateRevision  // binding dependency: file reloads
+    if (notificationService && typeof notificationService.doNotDisturb === "boolean")
+      return notificationService.doNotDisturb
+    try {
+      var parsed = JSON.parse(String(dndStateFile.text() || "{}"))
+      return !!(parsed && parsed.dnd === true)
+    } catch (e) { return false }
+  }
   function toggleDnd() {
-    if (dndSupported) notificationService.setDoNotDisturb(!notificationService.doNotDisturb)
+    if (notificationService && typeof notificationService.setDoNotDisturb === "function") {
+      notificationService.setDoNotDisturb(!notificationService.doNotDisturb)
+      return
+    }
+    if (dndToggle.running) return
+    dndToggle.command = ["omarchy-shell", "-q", "notifications", "toggleDnd"]
+    dndToggle.running = true
+  }
+
+  Process {
+    id: dndToggle
+    stdout: StdioCollector { waitForEnd: true }
+    // The service rewrites the state file on a DND change; the watcher bumps
+    // the revision, and this bump covers the case where the read races it.
+    onExited: root.dndStateRevision++
   }
 
   readonly property string icon: {
@@ -161,7 +208,17 @@ BarWidget {
   }
 
   function clearAll() {
-    if (!root.notificationService) return
+    if (!root.notificationService) {
+      if (!hostClear.running) {
+        hostClear.command = ["bash", "-c",
+          "omarchy-shell -q notifications dismissAll; omarchy-shell -q notifications clear"]
+        hostClear.running = true
+      }
+      root.historyRows = []
+      root.hiddenHistoryKeys = ({})
+      rebuildRows()
+      return
+    }
     if (typeof root.notificationService.clearPopups === "function") root.notificationService.clearPopups()
     if (typeof root.notificationService.clearHistory === "function") root.notificationService.clearHistory()
     root.historyRows = []
