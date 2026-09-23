@@ -48,7 +48,8 @@ BarWidget {
   readonly property int liveCount: notificationService && notificationService.popupModel
     ? notificationService.popupModel.count : 0
   readonly property string historyDir: notificationService && notificationService.historyDir
-    ? String(notificationService.historyDir) : ""
+  ? String(notificationService.historyDir)
+  : Quickshell.env("HOME") + "/.local/state/omarchy/notifications/history/"
 
   // ---- DND (guarded: lives on Omarchy's first-party service, not here).
   readonly property bool dndSupported: !!notificationService
