@@ -124,12 +124,15 @@ history.
 The notification history is maintained by Omarchy's notification service.
 This plugin does not replace that storage layer.
 
-The current Omarchy notification API does not expose an individual-history
-dismissal API or a read/unread API, so:
+Third-party plugins only see Do Not Disturb on Omarchy's notification
+service, so the plugin reads the service's state files
+(`~/.local/state/omarchy/notifications/live.json` and `history.json`) and
+cannot remove entries from them. As a result:
 
-- Individual dismissal is available for live notifications.
-- Historical notifications follow Omarchy's stored history.
-- Clear All can clear the available live notifications and saved history.
+- Dismiss and Clear All hide entries in the Notification Center only. Hidden
+  entries are remembered in
+  `~/.local/state/shavanced.notification-center/hidden.json`.
+- Live toasts on screen are still dismissed through Omarchy itself.
 - The number of retained historical entries is determined by Omarchy.
 
 These limitations may change as Omarchy's notification API evolves.
