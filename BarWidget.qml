@@ -163,9 +163,16 @@ BarWidget {
   }
 
   function clearAll() {
-    if (!root.notificationService) return
-    if (typeof root.notificationService.clearPopups === "function") root.notificationService.clearPopups()
-    if (typeof root.notificationService.clearHistory === "function") root.notificationService.clearHistory()
+    // Third-party plugins only get a narrow proxy of the notifications
+    // service (DND only), so clearPopups/clearHistory are usually missing.
+    // Fall back to the shell's own IPC handler, which can do both.
+    var svc = root.notificationService
+    var canClearPopups = !!svc && typeof svc.clearPopups === "function"
+    var canClearHistory = !!svc && typeof svc.clearHistory === "function"
+    if (canClearPopups) svc.clearPopups()
+    else Quickshell.execDetached(["omarchy-shell", "-q", "notifications", "dismissAll"])
+    if (canClearHistory) svc.clearHistory()
+    else Quickshell.execDetached(["omarchy-shell", "-q", "notifications", "clear"])
     root.historyRows = []
     root.hiddenHistoryKeys = ({})
     rebuildRows()
