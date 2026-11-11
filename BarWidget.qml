@@ -18,6 +18,7 @@ import QtQuick.Controls
 import Quickshell
 import Quickshell.Io
 import qs.Commons
+import qs.Commons as Commons
 import qs.Ui
 import "NotificationLogic.js" as NotificationLogic
 
@@ -48,7 +49,8 @@ BarWidget {
   readonly property int liveCount: notificationService && notificationService.popupModel
     ? notificationService.popupModel.count : 0
   readonly property string historyDir: notificationService && notificationService.historyDir
-    ? String(notificationService.historyDir) : ""
+  ? String(notificationService.historyDir)
+  : Quickshell.env("HOME") + "/.local/state/omarchy/notifications/history/"
 
   // ---- DND (guarded: lives on Omarchy's first-party service, not here).
   readonly property bool dndSupported: !!notificationService
@@ -66,11 +68,11 @@ BarWidget {
   }
 
   // Theme palette (mirrors the old widget's tokens).
-  readonly property color colForeground: Color.foreground
-  readonly property color colDim: Qt.darker(Color.foreground, 1.4)
-  readonly property color colBorder: Style.normalBorderFor(Color.foreground, Color.accent)
-  readonly property color colSurface: Style.normalFillFor(Color.foreground, Color.accent)
-  readonly property color colAccent: Color.accent
+  readonly property color colForeground: Commons.Color.foreground
+  readonly property color colDim: Qt.darker(Commons.Color.foreground, 1.4)
+  readonly property color colBorder: Style.normalBorderFor(Commons.Color.foreground, Commons.Color.accent)
+  readonly property color colSurface: Style.normalFillFor(Commons.Color.foreground, Commons.Color.accent)
+  readonly property color colAccent: Commons.Color.accent
   readonly property int cardRadius: notificationService && notificationService.cornerRadius
     ? notificationService.cornerRadius : Style.cornerRadius
 
@@ -161,9 +163,16 @@ BarWidget {
   }
 
   function clearAll() {
-    if (!root.notificationService) return
-    if (typeof root.notificationService.clearPopups === "function") root.notificationService.clearPopups()
-    if (typeof root.notificationService.clearHistory === "function") root.notificationService.clearHistory()
+    // Third-party plugins only get a narrow proxy of the notifications
+    // service (DND only), so clearPopups/clearHistory are usually missing.
+    // Fall back to the shell's own IPC handler, which can do both.
+    var svc = root.notificationService
+    var canClearPopups = !!svc && typeof svc.clearPopups === "function"
+    var canClearHistory = !!svc && typeof svc.clearHistory === "function"
+    if (canClearPopups) svc.clearPopups()
+    else Quickshell.execDetached(["omarchy-shell", "-q", "notifications", "dismissAll"])
+    if (canClearHistory) svc.clearHistory()
+    else Quickshell.execDetached(["omarchy-shell", "-q", "notifications", "clear"])
     root.historyRows = []
     root.hiddenHistoryKeys = ({})
     rebuildRows()
@@ -313,7 +322,7 @@ BarWidget {
               id: dndGlyph
               text: root.dndOn ? "󰂛" : "󰂚"
               font.family: root.bar ? root.bar.fontFamily : ""
-              color: root.dndOn ? Color.background : root.colDim
+              color: root.dndOn ? Commons.Color.background : root.colDim
               font.pixelSize: Style.font.body
               anchors.verticalCenter: parent.verticalCenter
             }
@@ -322,7 +331,7 @@ BarWidget {
               id: dndLabel
               text: root.dndOn ? "DND on" : "DND off"
               font.family: root.bar ? root.bar.fontFamily : ""
-              color: root.dndOn ? Color.background : root.colDim
+              color: root.dndOn ? Commons.Color.background : root.colDim
               font.pixelSize: Style.font.caption
               font.bold: true
               anchors.verticalCenter: parent.verticalCenter
@@ -468,7 +477,7 @@ BarWidget {
               Layout.alignment: Qt.AlignTop
               visible: rowCard.modelData.glyph !== ""
               text: rowCard.modelData.glyph
-              color: rowCard.modelData.urgency === 2 ? Color.urgent : Color.accent
+              color: rowCard.modelData.urgency === 2 ? Commons.Color.urgent : Commons.Color.accent
               font.family: root.bar ? root.bar.fontFamily : ""
               font.pixelSize: Style.font.icon
             }
